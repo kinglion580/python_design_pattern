@@ -1,9 +1,24 @@
 from abc import ABCMeta, abstractmethod
 
 
-class WaterHeater:
+class Observable:
     def __init__(self):
         self.__observers = []
+
+    def add_observer(self, observer):
+        self.__observers.append(observer)
+
+    def remove_observer(self, observer):
+        self.__observers.remove(observer)
+
+    def notify_observer(self):
+        for o in self.__observers:
+            o.update(self)
+
+
+class WaterHeater(Observable):
+    def __init__(self):
+        super().__init__()
         self.__temperature = 25
 
     def get_temperature(self):
@@ -11,14 +26,7 @@ class WaterHeater:
 
     def set_temperature(self, temperature):
         self.__temperature = temperature
-        self.notifies()
-
-    def add_observer(self, observer):
-        self.__observers.append(observer)
-
-    def notifies(self):
-        for o in self.__observers:
-            o.update(self)
+        self.notify_observer()
 
 
 class Observer(metaclass=ABCMeta):
@@ -43,6 +51,8 @@ class WashingMode(Observer):
 if __name__ == "__main__":
     wh = WaterHeater()
     dm = DrinkMode()
+    wm = WashingMode()
     wh.add_observer(dm)
+    wh.add_observer(wm)
     wh.set_temperature(60)
     wh.set_temperature(100)
