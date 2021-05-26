@@ -25,7 +25,8 @@ class Observer(metaclass=ABCMeta):
 
 
 class Account(Observable):
-    def __int__(self):
+    def __init__(self):
+        super().__init__()
         self.__latestRegion = {}
 
     def login(self, name, ip, time_):
