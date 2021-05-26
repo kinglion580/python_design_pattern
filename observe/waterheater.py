@@ -31,20 +31,20 @@ class WaterHeater(Observable):
 
 class Observer(metaclass=ABCMeta):
     @abstractmethod
-    def update(self, waterheater):
+    def update(self, observable):
         pass
 
 
 class DrinkMode(Observer):
-    def update(self, waterheater):
-        if waterheater.get_temperature() >= 100:
+    def update(self, observable):
+        if isinstance(observable, WaterHeater) and observable.get_temperature() >= 100:
             print('you can drink')
 
 
 class WashingMode(Observer):
-    def update(self, waterheater):
-        temperature = waterheater.get_temperature()
-        if 50 <= temperature < 70:
+    def update(self, observable):
+        temperature = observable.get_temperature()
+        if isinstance(observable, WaterHeater) and 50 <= temperature < 70:
             print('you can wash')
 
 
