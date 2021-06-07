@@ -61,5 +61,6 @@ class MyDuck(Duck):
 
 myduck = MyDuck()
 myduck.display()
+myduck.swim()
 myduck.perform_fly()
 myduck.perform_quack()
