@@ -1,3 +1,5 @@
+from operator import attrgetter
+
 class Person:
     def __init__(self, name, age, weight, height):
         self.name = name
@@ -51,6 +53,8 @@ SortPerson(CompareByAge()).sort(personList)
 for p in personList:
     print(p)
 
-
+sortedpersons = sorted(personList, key=attrgetter('age'))
+for p in sortedpersons:
+    print(p)
 
 
