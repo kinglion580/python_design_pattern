@@ -21,9 +21,9 @@ class DisplayElement:
 
 class WeatherData(Subject):
     observers = []
-    temp = ''
-    humidity = ''
-    pressure = ''
+    temp = 0
+    humidity = 0
+    pressure = 0.0
 
     def register_observer(self, o):
         self.observers.append(o)
@@ -43,6 +43,8 @@ class WeatherData(Subject):
         self.humidity = humidity
         self.pressure = pressure
 
+        self.measurements_changed()
+
 
 class CurrentConditionsDisplay(Observer, DisplayElement):
     temp = ''
@@ -50,7 +52,7 @@ class CurrentConditionsDisplay(Observer, DisplayElement):
 
     def __init__(self, weather_data):
         self.weather_data = weather_data
-        weather_data.registerObserver(self)
+        weather_data.register_observer(self)
 
     def update(self, temp, humidity, pressure):
         self.temp = temp
@@ -59,7 +61,7 @@ class CurrentConditionsDisplay(Observer, DisplayElement):
         self.display()
 
     def display(self):
-        print("Current conditions: " + self.temp + "F degrees and " + self.humidity + "% Humidity")
+        print("Current conditions: " + str(self.temp) + "F degrees and " + str(self.humidity) + "% Humidity")
 
 
 class StatisticsDisplay(Observer, DisplayElement):
@@ -71,7 +73,7 @@ class StatisticsDisplay(Observer, DisplayElement):
 
     def __init__(self, weather_data):
         self.weather_data = weather_data
-        weather_data.registerObserver(self)
+        weather_data.register_observer(self)
 
     def update(self, temp, humidity, pressure):
         self.temp_sum += temp
@@ -87,7 +89,7 @@ class StatisticsDisplay(Observer, DisplayElement):
 
     def display(self):
         print("Avg/Max/Min temperature = " + str(self.temp_sum / self.num_readings) + "/"
-              + self.max_temp + "/" + self.min_temp)
+              + str(self.max_temp) + "/" + str(self.min_temp))
 
 
 class ForecastDisplay(Observer, DisplayElement):
@@ -96,7 +98,7 @@ class ForecastDisplay(Observer, DisplayElement):
 
     def __init__(self, weather_data):
         self.weather_data = weather_data
-        weather_data.registerObserver(self)
+        weather_data.register_observer(self)
 
     def update(self, temp, humidity, pressure):
         self.last_pressure = self.current_pressure
@@ -112,4 +114,15 @@ class ForecastDisplay(Observer, DisplayElement):
             print("More of the same")
         elif self.current_pressure < self.last_pressure:
             print("Watch out for cooler, rainy weather")
+
+
+class WeatherStation:
+    weather_data = WeatherData()
+    current_display = CurrentConditionsDisplay(weather_data)
+    statistics_display = StatisticsDisplay(weather_data)
+    forecast_display = ForecastDisplay(weather_data)
+
+    weather_data.set_measurements(80, 65, 30.4)
+    weather_data.set_measurements(82, 70, 29.2)
+    weather_data.set_measurements(78, 90, 29.2)
 
