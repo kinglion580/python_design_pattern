@@ -55,6 +55,7 @@ class CurrentConditionsDisplay(Observer, DisplayElement):
     def update(self, temp, humidity, pressure):
         self.temp = temp
         self.humidity = humidity
+
         self.display()
 
     def display(self):
@@ -62,7 +63,10 @@ class CurrentConditionsDisplay(Observer, DisplayElement):
 
 
 class StatisticsDisplay(Observer, DisplayElement):
-    temp = ''
+    max_temp = 0.0
+    min_temp = 200
+    temp_sum = 0.0
+    num_readings = 0
     humidity = ''
 
     def __init__(self, weather_data):
@@ -70,27 +74,42 @@ class StatisticsDisplay(Observer, DisplayElement):
         weather_data.registerObserver(self)
 
     def update(self, temp, humidity, pressure):
-        self.temp = temp
-        self.humidity = humidity
+        self.temp_sum += temp
+        self.num_readings += 1
+
+        if temp > self.max_temp:
+            self.max_temp = temp
+
+        if temp < self.min_temp:
+            self.min_temp = temp
+
         self.display()
 
     def display(self):
-        print("Statistics: " + self.temp + "F degrees and " + self.humidity + "% Humidity")
+        print("Avg/Max/Min temperature = " + str(self.temp_sum / self.num_readings) + "/"
+              + self.max_temp + "/" + self.min_temp)
 
 
 class ForecastDisplay(Observer, DisplayElement):
-    temp = ''
-    humidity = ''
+    current_pressure = 29.92
+    last_pressure = 0.0
 
     def __init__(self, weather_data):
         self.weather_data = weather_data
         weather_data.registerObserver(self)
 
     def update(self, temp, humidity, pressure):
-        self.temp = temp
-        self.humidity = humidity
+        self.last_pressure = self.current_pressure
+        self.current_pressure = pressure
+
         self.display()
 
     def display(self):
-        print("Current conditions: " + self.temp + "F degrees and " + self.humidity + "% Humidity")
+        print("Forecast ")
+        if self.current_pressure > self.last_pressure:
+            print("Improving weather on the way!")
+        elif self.current_pressure == self.last_pressure:
+            print("More of the same")
+        elif self.current_pressure < self.last_pressure:
+            print("Watch out for cooler, rainy weather")
 
