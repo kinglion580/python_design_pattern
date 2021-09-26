@@ -87,7 +87,7 @@ class Eggplant(Veggies):
 
 
 class Pizza:
-    name = ""
+    _name = ""
     dough = ""
     sauce = ""
     veggies = []
@@ -104,11 +104,13 @@ class Pizza:
     def box(self):
         print("Place pizza in official PizzaStore box")
 
-    def set_name(self, name):
-        self.name = name
+    @property
+    def name(self):
+        return self._name
 
-    def get_name(self):
-        return self.name
+    @name.setter
+    def name(self, name):
+        self._name = name
 
     def __str__(self):
         result = "---- " + self.name + " ----\n"
@@ -146,7 +148,7 @@ class PizzaStore:
 
     def order_pizza(self, type_):
         pizza = self.create_pizza(type_)
-        print("--- Making a " + pizza.get_name() + "---")
+        print("--- Making a " + pizza.name + "---")
         pizza.prepare()
         pizza.bake()
         pizza.cut()
@@ -161,10 +163,10 @@ class NYStylePizzaStore(PizzaStore):
         ingredient_factory = NYPizzaIngredientFactory()
         if type_ == "cheese":
             pizza = CheesePizza(ingredient_factory)
-            pizza.set_name("New York Style Cheese Pizza")
+            pizza.name = "New York Style Cheese Pizza"
         elif type_ == "pepperoni":
             pizza = PepperoniPizza(ingredient_factory)
-            pizza.set_name("New York Style Pepperoni Pizza")
+            pizza.name = "New York Style Pepperoni Pizza"
         return pizza
     
 
@@ -174,10 +176,10 @@ class ChicagoStylePizzaStore(PizzaStore):
         ingredient_factory = ChicagoPizzaIngredientFactory()
         if type_ == "cheese":
             pizza = CheesePizza(ingredient_factory)
-            pizza.set_name("Chicago Style Cheese Pizza")
+            pizza.name = "Chicago Style Cheese Pizza"
         elif type_ == "pepperoni":
             pizza = PepperoniPizza(ingredient_factory)
-            pizza.set_name("Chicago Style Pepperoni Pizza")
+            pizza.name = "Chicago Style Pepperoni Pizza"
         return pizza
 
 
@@ -186,7 +188,7 @@ def test_pizza():
     chicagostore = ChicagoStylePizzaStore()
 
     pizza = nystore.order_pizza("cheese")
-    print("Ethan ordered a " + pizza.get_name() + "\n")
+    print("Ethan ordered a " + pizza.name + "\n")
 
     pizza = chicagostore.order_pizza("cheese")
-    print("Joel ordered a " + pizza.get_name() + "\n")
+    print("Joel ordered a " + pizza.name + "\n")
