@@ -1,94 +1,3 @@
-class PizzaStore:
-    def create_pizza(self, type_):
-        pass
-
-    def order_pizza(self, type_):
-        pizza = self.create_pizza(type_)
-
-        pizza.prepare()
-        pizza.bake()
-        pizza.cut()
-        pizza.box()
-
-        return pizza
-
-
-class NYStylePizzaStore(PizzaStore):
-    def create_pizza(self, type_):
-        pizza = None
-        if type_ == "cheese":
-            pizza = NYStyleCheesePizza()
-        # elif type_ == "pepperoni":
-        #     pizza = NYStylePepperoniPizza()
-        # elif type_ == "clam":
-        #     pizza = NYStyleClamPizza()
-        # elif type_ == "veggie":
-        #     pizza = NYStyleVeggiePizza()
-        return pizza
-    
-
-class ChicagoStylePizzaStore(PizzaStore):
-    def create_pizza(self, type_):
-        pizza = None
-        if type_ == "cheese":
-            pizza = ChicagoStyleCheesePizza()
-        # elif type_ == "pepperoni":
-        #     pizza = ChicagoStylePepperoniPizza()
-        # elif type_ == "clam":
-        #     pizza = ChicagoStyleClamPizza()
-        # elif type_ == "veggie":
-        #     pizza = ChicagoStyleVeggiePizza()
-        return pizza
-
-
-class Pizza:
-    name = ""
-    dough = ""
-    sauce = ""
-    toppings = []
-
-    def prepare(self):
-        print("Preparing " + self.name + "\n")
-        print("Tossing dough...\n")
-        print("Adding sauce...\n")
-        print("Adding toppings: \n")
-        for topping in self.toppings:
-            print("   " + topping + "\n")
-
-    def bake(self):
-        print("Bake for 25 minutes at 350")
-
-    def cut(self):
-        print("Cutting the pizza into diagonal slices")
-
-    def box(self):
-        print("Place pizza in official PizzaStore box")
-
-    def get_name(self):
-        return self.name
-
-
-class NYStyleCheesePizza(Pizza):
-    def __init__(self):
-        self.name = "NY Style Sauce and Cheese Pizza"
-        self.dough = "Thin Crust Dough"
-        self.sauce = "Marinara Sauce"
-
-        self.toppings.append("Grated Reggiano Cheese")
-
-
-class ChicagoStyleCheesePizza(Pizza):
-    def __init__(self):
-        self.name = "Chicago Style Deep Dih Cheese Pizza"
-        self.dough = "Extra Thick Crust Dough"
-        self.sauce = "Plum Tomato Sauce"
-
-        self.toppings.append("Shredded Mozzarella Cheese")
-
-    def cut(self):
-        print("Cutting the pizza into square slices")
-
-
 class PizzaIngredientFactory:
     def create_dough(self):
         pass
@@ -125,58 +34,151 @@ class ChicagoPizzaIngredientFactory(PizzaIngredientFactory):
 
 
 class Dough:
-    def to_string(self):
-        pass
+    pass
 
 
 class ThickCrustDough(Dough):
-    def to_string(self):
+    def __str__(self):
         return "ThickCrust style extra thick crust dough"
 
 
 class ThinCrustDough(Dough):
-    def to_string(self):
+    def __str__(self):
         return "ThinCrust style extra thin crust dough"
 
 
 class Sauce:
-    def to_string(self):
+    def __str__(self):
         pass
 
 
 class MarinaraSauce(Sauce):
-    def to_string(self):
+    def __str__(self):
         return "Marinara Sauce"
 
 
 class PlumTomatoSauce(Sauce):
-    def to_string(self):
+    def __str__(self):
         return "Plum Tomato Sauce"
 
 
 class Veggies:
-    def to_string(self):
-        pass
+    pass
 
 
 class Garlic(Veggies):
-    def to_string(self):
+    def __str__(self):
         return "Garlic"
 
 
 class Onion(Veggies):
-    def to_string(self):
+    def __str__(self):
         return "Onion"
 
 
 class BlackOlives(Veggies):
-    def to_string(self):
+    def __str__(self):
         return "Black Olives"
 
 
 class Eggplant(Veggies):
-    def to_string(self):
+    def __str__(self):
         return "Eggplant"
+
+
+class Pizza:
+    name = ""
+    dough = ""
+    sauce = ""
+    veggies = []
+
+    def prepare(self):
+        pass
+
+    def bake(self):
+        print("Bake for 25 minutes at 350")
+
+    def cut(self):
+        print("Cutting the pizza into diagonal slices")
+
+    def box(self):
+        print("Place pizza in official PizzaStore box")
+
+    def set_name(self, name):
+        self.name = name
+
+    def get_name(self):
+        return self.name
+
+    def __str__(self):
+        result = "---- " + self.name + " ----\n"
+        if self.dough:
+            result.join(self.dough)
+        if self.sauce:
+            result.join(self.sauce)
+        if self.veggies:
+            result.join(",".join(self.veggies) + "\n")
+
+
+class CheesePizza(Pizza):
+    def __init__(self, ingredient_factory):
+        self.ingredient_factory = ingredient_factory
+
+    def prepare(self):
+        print("Preparing " + self.name)
+        dough = self.ingredient_factory.create_dough()
+        sauce = self.ingredient_factory.create_sauce()
+
+
+class PepperoniPizza(Pizza):
+    def __init__(self, ingredient_factory: PizzaIngredientFactory):
+        self.ingredient_factory = ingredient_factory
+
+    def prepare(self):
+        print("Preparing " + self.name)
+        dough = self.ingredient_factory.create_dough()
+        veggies = self.ingredient_factory.create_veggies()
+
+
+class PizzaStore:
+    def create_pizza(self, type_) -> Pizza:
+        pass
+
+    def order_pizza(self, type_):
+        pizza = self.create_pizza(type_)
+        print("--- Making a " + pizza.get_name() + "---")
+        pizza.prepare()
+        pizza.bake()
+        pizza.cut()
+        pizza.box()
+
+        return pizza
+
+
+class NYStylePizzaStore(PizzaStore):
+    def create_pizza(self, type_):
+        pizza = None
+        ingredient_factory = NYPizzaIngredientFactory()
+        if type_ == "cheese":
+            pizza = CheesePizza(ingredient_factory)
+            pizza.set_name("New York Style Cheese Pizza")
+        elif type_ == "pepperoni":
+            pizza = PepperoniPizza(ingredient_factory)
+            pizza.set_name("New York Style Pepperoni Pizza")
+        return pizza
+    
+
+class ChicagoStylePizzaStore(PizzaStore):
+    def create_pizza(self, type_):
+        pizza = None
+        ingredient_factory = ChicagoPizzaIngredientFactory()
+        if type_ == "cheese":
+            pizza = CheesePizza(ingredient_factory)
+            pizza.set_name("Chicago Style Cheese Pizza")
+        elif type_ == "pepperoni":
+            pizza = PepperoniPizza(ingredient_factory)
+            pizza.set_name("Chicago Style Pepperoni Pizza")
+        return pizza
 
 
 def test_pizza():
