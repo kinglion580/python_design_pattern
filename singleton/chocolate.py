@@ -1,3 +1,19 @@
+import _thread
+import time
+
+
+def singleton_decorator(cls, *args, **kargs):
+    instance = {}
+
+    def wrapper_singleton(*args, **kargs):
+        if cls not in instance:
+            instance[cls] = cls(*args, **kargs)
+        return instance[cls]
+
+    return wrapper_singleton
+
+
+@singleton_decorator
 class ChocolateBoiler:
     def __init__(self):
         self.empty = True
