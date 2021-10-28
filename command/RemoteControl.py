@@ -1,6 +1,6 @@
 class Command:
     def execute(self):
-        pass
+        raise NotImplementedError("Command subclass must implement execute()")
 
 
 class LightCommand(Command):
@@ -27,6 +27,19 @@ class GarageDoorCommand(Command):
         self.__garagedoor.up()
 
 
+class GarageDoorOffCommand(Command):
+    def __init__(self, garagedoor):
+        self.__garagedoor = garagedoor
+
+    def execute(self):
+        self.__garagedoor.down()
+
+
+class NoCommand(Command):
+    def execute(self):
+        print("no command")
+
+
 class Light:
     def on(self):
         print("light on")
@@ -39,39 +52,47 @@ class GarageDoor:
     def up(self):
         print("GarageDoor up")
 
+    def down(self):
+        print("GarageDoor down")
+
 
 class SimpleRemoteControl:
     def __init__(self):
-        self.__command = None
+        self._command = None
 
     def set_command(self, command: Command):
-        self.__command = command
+        self._command = command
 
     def button_was_pressed(self):
-        if self.__command is not None:
-            self.__command.execute()
+        if self._command is not None:
+            self._command.execute()
 
 
 class RemoteControl:
     def __init__(self):
-        self.__oncommand = []
-        self.__offcommand = []
+        self._oncommand = []
+        self._offcommand = []
 
-        nocommand = Command()
-
-        for i in range(len(self.__oncommand)):
-            self.__oncommand[i] = nocommand
-            self.__offcommand[i] = nocommand
+        for _ in range(7):
+            self._oncommand.append(nocommand)
+            self._offcommand.append(nocommand)
 
     def set_command(self, slot: int, oncommand: Command, offcommand: Command):
-        self.__oncommand[slot] = oncommand
-        self.__offcommand[slot] = offcommand
+        self._oncommand[slot] = oncommand
+        self._offcommand[slot] = offcommand
 
     def on_button_was_pressed(self, slot):
-        self.__oncommand[slot].execute()
+        self._oncommand[slot].execute()
 
     def off_button_was_pressed(self, slot):
-        self.__offcommand[slot].execute()
+        self._offcommand[slot].execute()
+
+    def __str__(self):
+        info = "\n--------- Remote Control ---------\n"
+        for i in range(len(self._oncommand)):
+            info += "[slot " + str(i) + "] " + self._oncommand[i].__class__.__name__ + "   " + \
+                    self._offcommand[i].__class__.__name__ + "\n"
+        return info
 
 
 def test():
@@ -80,11 +101,11 @@ def test():
     light_command = LightCommand(light)
     light_off_command = LightOffCommand(light)
     gd_command = GarageDoorCommand(garagedoor)
-    remote = SimpleRemoteControl()
-    remote.set_command(light_command)
-    remote.button_was_pressed()
-    remote.set_command(light_off_command)
-    remote.button_was_pressed()
-    remote.set_command(gd_command)
-    remote.button_was_pressed()
-
+    gd_off_command = GarageDoorOffCommand(garagedoor)
+    remote = RemoteControl()
+    remote.set_command(1, light_command, light_off_command)
+    remote.set_command(3, gd_command, gd_off_command)
+    remote.on_button_was_pressed(1)
+    remote.off_button_was_pressed(3)
+    remote.on_button_was_pressed(2)
+    print(remote)
