@@ -35,6 +35,24 @@ class GarageDoorOffCommand(Command):
         self.__garagedoor.down()
 
 
+class StereoWithCDComand(Command):
+    def __init__(self, stereo):
+        self._stereo = stereo
+
+    def execute(self):
+        self._stereo.on()
+        self._stereo.set_cd()
+        self._stereo.set_volume(11)
+
+
+class StereoOffCommand(Command):
+    def __init__(self, stereo):
+        self._stereo = stereo
+
+    def execute(self):
+        self._stereo.off()
+
+
 class NoCommand(Command):
     def execute(self):
         print("no command")
@@ -56,6 +74,20 @@ class GarageDoor:
         print("GarageDoor down")
 
 
+class Stereo:
+    def on(self):
+        print("Stereo on")
+
+    def off(self):
+        print("Stereo off")
+
+    def set_cd(self):
+        print("set cd")
+
+    def set_volume(self, volume):
+        print("set volume " + str(volume))
+
+
 class SimpleRemoteControl:
     def __init__(self):
         self._command = None
@@ -68,14 +100,12 @@ class SimpleRemoteControl:
             self._command.execute()
 
 
-class RemoteControl:
+class MyRemoteControl:
     def __init__(self):
-        self._oncommand = []
-        self._offcommand = []
+        nocommand = NoCommand()
 
-        for _ in range(7):
-            self._oncommand.append(nocommand)
-            self._offcommand.append(nocommand)
+        self._oncommand = [nocommand] * 7
+        self._offcommand = [nocommand] * 7
 
     def set_command(self, slot: int, oncommand: Command, offcommand: Command):
         self._oncommand[slot] = oncommand
@@ -98,14 +128,20 @@ class RemoteControl:
 def test():
     light = Light()
     garagedoor = GarageDoor()
+    stereo = Stereo()
     light_command = LightCommand(light)
     light_off_command = LightOffCommand(light)
     gd_command = GarageDoorCommand(garagedoor)
     gd_off_command = GarageDoorOffCommand(garagedoor)
-    remote = RemoteControl()
+    stereo_command = StereoWithCDComand(stereo)
+    stereo_off_command = StereoOffCommand(stereo)
+    remote = MyRemoteControl()
     remote.set_command(1, light_command, light_off_command)
     remote.set_command(3, gd_command, gd_off_command)
+    remote.set_command(4, stereo_command, stereo_off_command)
     remote.on_button_was_pressed(1)
     remote.off_button_was_pressed(3)
     remote.on_button_was_pressed(2)
+    remote.on_button_was_pressed(4)
+    remote.off_button_was_pressed(4)
     print(remote)
