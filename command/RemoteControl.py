@@ -2,37 +2,46 @@ class Command:
     def execute(self):
         raise NotImplementedError("Command subclass must implement execute()")
 
+    def undo(self):
+        pass
+
 
 class LightCommand(Command):
     def __init__(self, light):
-        self.__light = light
+        self._light = light
 
     def execute(self):
-        self.__light.on()
+        self._light.on()
+
+    def undo(self):
+        self._light.off()
 
 
 class LightOffCommand(Command):
     def __init__(self, light):
-        self.__light = light
+        self._light = light
 
     def execute(self):
-        self.__light.off()
+        self._light.off()
+
+    def undo(self):
+        self._light.on()
 
 
 class GarageDoorCommand(Command):
     def __init__(self, garagedoor):
-        self.__garagedoor = garagedoor
+        self._garagedoor = garagedoor
 
     def execute(self):
-        self.__garagedoor.up()
+        self._garagedoor.up()
 
 
 class GarageDoorOffCommand(Command):
     def __init__(self, garagedoor):
-        self.__garagedoor = garagedoor
+        self._garagedoor = garagedoor
 
     def execute(self):
-        self.__garagedoor.down()
+        self._garagedoor.down()
 
 
 class StereoWithCDComand(Command):
@@ -107,15 +116,22 @@ class MyRemoteControl:
         self._oncommand = [nocommand] * 7
         self._offcommand = [nocommand] * 7
 
+        self._undocommand = nocommand
+
     def set_command(self, slot: int, oncommand: Command, offcommand: Command):
         self._oncommand[slot] = oncommand
         self._offcommand[slot] = offcommand
 
     def on_button_was_pressed(self, slot):
         self._oncommand[slot].execute()
+        self._undocommand = self._oncommand[slot]
 
     def off_button_was_pressed(self, slot):
         self._offcommand[slot].execute()
+        self._undocommand = self._offcommand[slot]
+
+    def undo_button_was_pressed(self):
+        self._undocommand.undo()
 
     def __str__(self):
         info = "\n--------- Remote Control ---------\n"
@@ -144,4 +160,8 @@ def test():
     remote.on_button_was_pressed(2)
     remote.on_button_was_pressed(4)
     remote.off_button_was_pressed(4)
+
+    print('\n------- Undo Command ----------\n')
+    remote.on_button_was_pressed(1)
+    remote.undo_button_was_pressed()
     print(remote)
